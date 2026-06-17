@@ -1,0 +1,195 @@
+---
+pagetitle: "Global Compensation Analysis"
+output:
+  html_document:
+    theme: null
+    highlight: null
+    mathjax: null
+    css: report.css
+    includes:
+      after_body: report_scroll.html
+knit: (function(input, ...) rmarkdown::render(input, output_file = "index.html"))
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo      = FALSE,
+  message   = FALSE,
+  warning   = FALSE,
+  fig.width  = 6,
+  fig.height = 3.5,
+  dpi        = 150,
+  out.width  = "100%"
+)
+library(dplyr)
+library(ggplot2)
+library(ggridges)
+
+df <- readRDS("../data/test4_dataset.rds")
+```
+
+<div class="report-wrap">
+
+<!-- ── HEADER ──────────────────────────────────── -->
+<!-- Edit the kicker, headline, deck, and byline.  -->
+<!-- Do not change the class names or HTML tags.   -->
+
+<header class="report-header fade-in">
+  <p class="report-kicker">
+    Data Analysis &middot; MBAA 531
+  </p>
+  <h1 class="report-headline">
+    Decoding Global Compensation
+  </h1>
+  <p class="report-deck">
+    An analysis of 23,876 global records reveals how experience levels and remote work arrangements are reshaping salary structures across the industry.
+  </p>
+  <p class="report-byline">
+    By <strong>Jie Zhang</strong> &middot;
+    Dataset: Global Compensation Data
+  </p>
+</header>
+
+
+<!-- ── SECTION 1: THE DATA ─────────────────────── -->
+
+::: {.report-section .fade-in}
+
+## The Data
+
+This dataset measures global compensation factors, including salary variations, professional experience levels, and remote work arrangements. The unit of observation is an individual worker, with the dataset encompassing exactly 23,876 records across 10 distinct variables. Understanding these metrics is crucial for identifying how remote flexibility and career tenure impact earning potential in today's rapidly evolving global labor market.
+
+:::
+
+
+<!-- ── SECTION 2: THE CENTRAL FINDING ─────────── -->
+
+::: {.report-section .fade-in}
+
+## The Central Finding
+
+To understand the true return on professional tenure, we created a derived variable: Salary per Year of Experience. By dividing the total annual salary by years of experience (and slightly adjusting entry-level roles to prevent mathematical errors), we can isolate the financial value of a single year of industry tenure.
+
+<div class="pull-stat fade-in">
+  <span class="stat-number">$14,764</span>
+  <span class="stat-label">
+    Median Salary per Year of Experience
+  </span>
+</div>
+
+This figure represents the median annual value of one year of experience across the dataset. We utilize the median, rather than the average, to prevent extreme salary outliers from skewing the results. In practical terms, it establishes a global benchmark for how much earning power a professional theoretically gains for each year spent in the workforce.
+
+:::
+
+
+<!-- ── SECTION 3: SCATTER CHART ───────────────── -->
+
+::: {.report-section .fade-in}
+
+## A Closer Look
+
+Before examining specific working models, it is essential to observe the broader relationship between professional experience and financial compensation. The scatter chart below maps every individual worker, setting up the traditional expectation that more years in the industry will naturally yield higher pay. However, pay attention to how the variance significantly widens as experience grows.
+
+<div class="chart-wrap">
+
+```{r scatter}
+# Global compensation plotted against years of experience
+ggplot(df, aes(x = experience_yrs, y = salary_usd)) +
+  geom_point(
+    alpha  = 0.35,
+    size   = 1.4,
+    colour = "#c0392b"
+  ) +
+  labs(title = NULL, x = "Years of Professional Experience", y = "Annual Salary (USD)") +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(
+      colour = "#eeeeee"
+    ),
+    axis.text = element_text(colour = "#555")
+  )
+```
+
+<p class="chart-caption">
+  Chart 1: Global compensation (USD) plotted against years of professional experience, illustrating the widening salary variance among senior professionals.
+</p>
+</div>
+
+While there is a clear upward trajectory, the significant vertical spread at higher experience levels suggests that tenure alone does not guarantee top-tier compensation. This indicates that other structural factors must be at play to explain the highest earners.
+
+:::
+
+
+<!-- ── SECTION 4: RIDGE CHART ─────────────────── -->
+
+::: {.report-section .fade-in}
+
+## Across Groups
+
+To understand the variance observed in our initial scatter plot, we segment the compensation data by professional experience tiers. The ridge chart below visualizes the salary density distributions across these distinct career stages, revealing exactly how earning power shifts as professionals move from entry-level to senior roles.
+
+<div class="chart-wrap">
+
+```{r ridge}
+# Salary distribution by experience tier
+ggplot(df, aes(x = salary_usd, y = cat_final, fill = cat_final)) +
+  geom_density_ridges(
+    alpha     = 0.6,
+    colour    = "white",
+    linewidth = 0.4
+  ) +
+  labs(title = NULL, x = "Annual Salary (USD)", y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position    = "none",
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.major.x = element_line(colour = "#eeeeee"),
+    axis.text          = element_text(colour = "#555")
+  )
+```
+
+<p class="chart-caption">
+  Chart 2: Salary density distributions (USD) categorized by experience tiers, highlighting the progressive shifts and widening spread in compensation.
+</p>
+</div>
+
+The distributions reveal striking insights into career progression. While entry-level tiers show highly concentrated, narrower salary ranges, the curves flatten and stretch significantly to the right in senior categories. This indicates that as professionals advance, their compensation becomes much more variable and highly dependent on specialized skills or leadership premiums, rather than just base tenure.
+
+:::
+
+
+<!-- ── CONCLUSION ──────────────────────────────── -->
+
+::: {.report-section .fade-in}
+
+## What This Means
+
+The data presents a clear and compelling narrative: while professional experience is the foundational driver of compensation growth, it is not a strict guarantee of premium earnings. As demonstrated by the scatter chart, the variance in salary widens dramatically as tenure increases, proving that time in the industry alone is insufficient for reaching the top tier of compensation.
+
+The ridge distributions further clarify this structural shift. Moving into senior experience tiers elevates the entire earning potential, but it also flattens and stretches the salary curve significantly. For decision-makers and HR strategists, the takeaway is critical: base salary scales linearly with time, but premium compensation is awarded for factors beyond mere tenure—most likely specialized skill sets, leadership capabilities, or strategic market value. 
+
+Ultimately, organizations must rethink how they structure senior compensation packages. However, a critical question remains unanswered by this dataset: which specific capabilities command that massive financial premium at the senior level? Is the highest variance driven by niche technical expertise, or by executive management responsibilities?
+
+:::
+
+
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+
+<footer class="report-footer">
+  <p>
+    Prepared by Jie Zhang &middot;
+    MBAA 531 Data Analytics &middot;
+    Vancouver Island University
+  </p>
+  <p>
+    Source:
+    <a href="https://github.com/Jie-VIU/mbaa531-report">
+      Data Analysis Capstone Project
+    </a>
+  </p>
+</footer>
+
+</div><!-- end .report-wrap -->
